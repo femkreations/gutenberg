@@ -835,14 +835,16 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			$node                  = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$selector              = $metadata['selector'];
-			$declarations          = self::compute_style_properties( $node );
-			$block_rules          .= self::to_ruleset( $selector, $declarations );
-			$has_block_gap_support = isset( $setting_nodes[ $selector ]['spacing']['blockGap'] ) && null !== $setting_nodes[ $selector ]['spacing']['blockGap'];
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$selector     = $metadata['selector'];
+			$declarations = self::compute_style_properties( $node );
+			$block_rules .= self::to_ruleset( $selector, $declarations );
 
-			if ( self::ROOT_BLOCK_SELECTOR === $selector && $has_block_gap_support ) {
-				$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
+				$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+				if ( $has_block_gap_support ) {
+					$block_rules .= '.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }';
+				}
 			}
 		}
 
